@@ -15,11 +15,43 @@ const resolvers = {
     },
   },
   Mutation: {
-    login: (parent, { email, password }, context) => {
-      // TODO: Implement the logic to handle user login
+    login: async (parent, { email, password }, context) => {
+      try {
+        // Searches for a user by written email
+        const user = await User.findOne({ email });
+
+        // Checks if the user exists and if the password written is correct
+        if (!user || !user.isCorrectPassword(password)) {
+          throw new AuthenticationError('Invalid email or password'); //email or password to not give away which one is wrong, better protection
+        }
+
+        // Generates a token and returns an Auth object with the token and user data
+        const token = signToken(user);
+        return { token, user };
+      } catch (error) {
+        console.error(error);
+        throw new AuthenticationError('Error during login');
+      }
     },
-    addUser: (parent, { username, email, password }, context) => {
-      // TODO: Implement the logic to add a new user
+    addUser: async (parent, { username, email, password }, context) => {
+      try {
+        // Checks if a user with the same email already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          throw new AuthenticationError('A user with this email already exists');
+        }
+
+        // Creates a new user using the User model in models folder
+        const newUser = new User({ username, email, password });
+        await newUser.save();
+
+        // Generates a token and returns an Auth object with the token and user data
+        const token = signToken(newUser);
+        return { token, user: newUser };
+      } catch (error) {
+        console.error(error);
+        throw new Error('Error adding a new user');
+      }
     },
     saveBook: async (parent, args, context) => {
       // Checks if a user is authenticated
