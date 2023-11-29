@@ -1,10 +1,17 @@
-const Book = require("../models/Book");
 const User = require("../models/User");
+const Book = require("../models/Book");
 
 const resolvers = {
   Query: {
-    me: (parent, args, context) => {
-      // TODO: Implement the logic to get the current user
+    me: async (parent, args, context) => {
+      // if statement checks if user is authenticated or not
+      if (!context.req.user) {
+        throw new AuthenticationError('User not authenticated');
+      }
+
+      // gets current user based on ID of context
+      const currentUser = await User.findById(context.req.user._id);
+      return currentUser;
     },
   },
   Mutation: {
