@@ -6,11 +6,18 @@ const path = require('path');
 const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
 
+const { authMiddleware, signToken } = require('./auth');
+
+
 const PORT = process.env.PORT || 3001;
 const app = express();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: ({ req }) => {
+    authMiddleware(req, {}, () => {});
+    return { req };
+  },
 });
 
 const startApolloServer = async () => {
