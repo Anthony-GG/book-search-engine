@@ -1,5 +1,5 @@
-import Book from "../models/Book";
-import User from "../models/User";
+const Book = require("../models/Book");
+const User = require("../models/User");
 
 const resolvers = {
   Query: {
