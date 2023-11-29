@@ -6,7 +6,7 @@ const path = require('path');
 const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
 
-const { authMiddleware, signToken } = require('./auth');
+const { authMiddleware, signToken } = require('./utils/auth');
 
 
 const PORT = process.env.PORT || 3001;
