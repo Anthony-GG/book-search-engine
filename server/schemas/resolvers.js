@@ -21,11 +21,56 @@ const resolvers = {
     addUser: (parent, { username, email, password }, context) => {
       // TODO: Implement the logic to add a new user
     },
-    saveBook: (parent, args, context) => {
-      // TODO: Implement the logic to save a book for the current user
+    saveBook: async (parent, args, context) => {
+      // Checks if a user is authenticated
+      if (!context.req.user) {
+        throw new AuthenticationError('User not authenticated');
+      }
+
+      try {
+        // creates a new book based on Mongoose Book model
+        const newBook = new Book({
+          ...args,
+        });
+
+        // Saves the book to the database at large
+        await newBook.save();
+
+        // Updates the user's savedBooks array with the new book
+        const updatedUser = await User.findByIdAndUpdate(
+          context.req.user._id,
+          { $push: { savedBooks: newBook } },
+          { new: true }
+        );
+
+        return updatedUser;
+      } catch (error) {
+        console.error(error);
+        throw new Error('Error saving the book');
+      }
     },
-    removeBook: (parent, { bookId }, context) => {
-      // TODO: Implement the logic to remove a book for the current user
+    removeBook: async (parent, { bookId }, context) => {
+      // Checks if a user is authenticated
+      if (!context.req.user) {
+        throw new AuthenticationError('User not authenticated');
+      }
+
+      try {
+        // Removes the book from the Book collection
+        await Book.findByIdAndRemove(bookId);
+
+        // Removes the book from the user's savedBooks array
+        const updatedUser = await User.findByIdAndUpdate(
+          context.req.user._id,
+          { $pull: { savedBooks: { bookId } } },
+          { new: true }
+        );
+
+        return updatedUser;
+      } catch (error) {
+        console.error(error);
+        throw new Error('Error removing the book');
+      }
     },
   },
 };
