@@ -4,9 +4,16 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'; //
 
 import Navbar from './components/Navbar';
 
+
+//instance of the ApolloClient creation
+const client = new ApolloClient({
+  uri: 'http://localhost:3001/graphql', 
+  cache: new InMemoryCache(),
+});
+
 function App() {
   return (
-    <ApolloProvider client={ApolloClient}>
+    <ApolloProvider client={client}>
       <>
         <Navbar />
         <Outlet />
