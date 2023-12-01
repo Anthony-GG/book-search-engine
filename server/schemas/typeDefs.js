@@ -12,7 +12,7 @@ const typeDefs = `
     description: String!
     bookId: String!
     image: String!
-    link: String!
+    link: String
     title: String!
   }
 
@@ -34,7 +34,7 @@ const typeDefs = `
       title: String!,
       bookId: String!,
       image: String!,
-      link: String!
+      link: String
     ): User!
     removeBook(bookId: String!): User!
   }

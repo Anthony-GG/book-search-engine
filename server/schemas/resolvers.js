@@ -62,6 +62,7 @@ const resolvers = {
         throw new AuthenticationError('User not authenticated');
       }
 
+
       try {
         // creates a new book based on Mongoose Book model
         const newBook = new Book({
@@ -81,6 +82,7 @@ const resolvers = {
         return updatedUser;
       } catch (error) {
         console.error(error);
+        console.log("hit")
         throw new Error('Error saving the book');
       }
     },
