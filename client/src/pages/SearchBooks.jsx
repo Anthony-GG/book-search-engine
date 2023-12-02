@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Container,
   Col,
@@ -25,7 +25,7 @@ const SearchBooks = () => {
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
-  const [saveBook] = useMutation(SAVE_BOOK);
+  const [saveBookMut] = useMutation(SAVE_BOOK);
 
 
   // create method to search for books and set state on form submit
@@ -60,6 +60,10 @@ const SearchBooks = () => {
     }
   };
 
+  useEffect(() => {
+    return () => saveBookIds(savedBookIds);
+  });
+
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId) => {
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
@@ -79,7 +83,7 @@ const SearchBooks = () => {
     }
 
     try {
-      await saveBook({
+      await saveBookMut({
         variables: {
           bookId: bookToSave.bookId,
           authors: bookToSave.authors,
@@ -93,7 +97,7 @@ const SearchBooks = () => {
 
       // if book successfully saves to user's account, save book id to state
       console.log(savedBookIds)
-      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+      setSavedBookIds([...savedBookIds, bookId]);
       
     } catch (err) {
       console.error(err);
