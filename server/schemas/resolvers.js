@@ -8,11 +8,15 @@ const resolvers = {
   Query: {
     user: async (parent, args, context) => {
       // if statement checks if user is authenticated or not
-      if (!context.req.user) {
+
+      const user = await User.findById(args.userId)
+
+      if (!user) {
         throw new AuthenticationError('User not authenticated');
       }
+
       // gets current user based on ID of context
-      const currentUser = await User.findById(context.req.user._id);
+      const currentUser = await User.findById(args.userId);
       return currentUser;
     },
   },
@@ -85,6 +89,8 @@ const resolvers = {
           { new: true, runValidators: true }
       );
 
+      console.log(updatedUser)
+
       if (!updatedUser) {
         throw new Error('User not found');
     }
@@ -96,10 +102,6 @@ const resolvers = {
       }
     },
     removeBook: async (parent, { bookId }, context) => {
-      // Checks if a user is authenticated
-      if (!context.req.user) {
-        throw new AuthenticationError('User not authenticated');
-      }
 
       try {
         // Removes the book from the Book collection

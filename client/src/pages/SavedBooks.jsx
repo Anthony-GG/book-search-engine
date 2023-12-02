@@ -7,13 +7,14 @@ import { REMOVE_BOOK } from '../utils/mutations.js'
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
-const SavedBooks = () => {
-  const { loading, data } = useQuery(GET_USER); // Update to use GET_USER
-  const [removeBook] = useMutation(REMOVE_BOOK);
+const token = Auth.loggedIn() ? Auth.getProfile() : null
 
-  useEffect(() => {
-    // You can perform additional logic here if needed
-  }, [data]);
+const SavedBooks = () => {
+  console.log(token.data._id)
+  const { loading, error, data } = useQuery(GET_USER, {
+    variables: {userId: token.data._id},
+  });
+  const [removeBook] = useMutation(REMOVE_BOOK);
 
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
@@ -35,10 +36,17 @@ const SavedBooks = () => {
   };
 
   if (loading) {
-    return <h2>LOADING...</h2>;
+    return <h2>Loading...</h2>;
   }
 
-  const userData = data?.getUser || {savedBooks: [] }; // Update to use getUser
+  if (error) {
+    console.error(error);
+    return <h2>Error loading data. Please try again.</h2>;
+  }
+
+  console.log(data)
+  const userData = data?.user || { savedBooks: [] };
+  console.log(userData)
 
   return (
     <>
