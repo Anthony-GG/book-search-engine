@@ -14,6 +14,7 @@ import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 import { useMutation } from '@apollo/client';
 import { SAVE_BOOK } from '../utils/mutations';
+import { GET_USER } from '../utils/queries';
 
 const SearchBooks = () => {
   // create state for holding returned google api data
@@ -25,6 +26,7 @@ const SearchBooks = () => {
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
   const [saveBook] = useMutation(SAVE_BOOK);
+
 
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
@@ -62,21 +64,25 @@ const SearchBooks = () => {
   const handleSaveBook = async (bookId) => {
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
 
-    console.log(bookToSave);
+    // get token
+    const token = Auth.loggedIn() ? Auth.getProfile() : null;
+
+    if (!token) {
+      return false;
+    }
+
     try {
-      const { data } = await saveBook({
+      await saveBook({
         variables: {
+          bookId: bookToSave.bookId,
           authors: bookToSave.authors,
           description: bookToSave.description,
           title: bookToSave.title,
-          bookId: bookToSave.bookId,
           image: bookToSave.image,
           link: bookToSave.link,
+          userId: token.data._id,
         },
       });
-
-      // Handle the response data as needed
-      console.log(data);
 
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);

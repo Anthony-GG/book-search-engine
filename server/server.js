@@ -18,7 +18,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => {
-    authMiddleware(req, {}, () => {});
+    authMiddleware(req, {}, () => {}); //populates req.user with decoded user unfo
     return { req };
   },
 });

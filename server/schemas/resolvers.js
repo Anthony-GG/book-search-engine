@@ -6,12 +6,11 @@ const { signToken } = require('../utils/auth');
 
 const resolvers = {
   Query: {
-    me: async (parent, args, context) => {
+    user: async (parent, args, context) => {
       // if statement checks if user is authenticated or not
       if (!context.req.user) {
         throw new AuthenticationError('User not authenticated');
       }
-
       // gets current user based on ID of context
       const currentUser = await User.findById(context.req.user._id);
       return currentUser;
@@ -58,31 +57,41 @@ const resolvers = {
     },
     saveBook: async (parent, args, context) => {
       // Checks if a user is authenticated
-      if (!context.req.user) {
+
+      const user = await User.findById(args.userId)
+
+      if (!user) {
         throw new AuthenticationError('User not authenticated');
       }
-
 
       try {
         // creates a new book based on Mongoose Book model
         const newBook = new Book({
-          ...args,
+          bookId: args.bookId,
+          authors: args.authors,
+          description: args.description,
+          title: args.title,
+          image: args.image,
+          link: args.link,
         });
 
-        // Saves the book to the database at large
+        // Saves the book
         await newBook.save();
 
         // Updates the user's savedBooks array with the new book
-        const updatedUser = await User.findByIdAndUpdate(
-          context.req.user._id,
-          { $push: { savedBooks: newBook } },
-          { new: true }
-        );
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: args.userId },
+          { $addToSet: { savedBooks: newBook } },
+          { new: true, runValidators: true }
+      );
+
+      if (!updatedUser) {
+        throw new Error('User not found');
+    }
 
         return updatedUser;
       } catch (error) {
         console.error(error);
-        console.log("hit")
         throw new Error('Error saving the book');
       }
     },
