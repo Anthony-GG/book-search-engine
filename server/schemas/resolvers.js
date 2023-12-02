@@ -101,15 +101,22 @@ const resolvers = {
         throw new Error('Error saving the book');
       }
     },
-    removeBook: async (parent, { bookId }, context) => {
+    removeBook: async (parent, { bookId, userId }, context) => {
 
       try {
+
+        const user = await User.findById(userId)
+
+        if (!user) {
+          throw new AuthenticationError('User not authenticated');
+        }
+
         // Removes the book from the Book collection
         await Book.findByIdAndRemove(bookId);
 
         // Removes the book from the user's savedBooks array
         const updatedUser = await User.findByIdAndUpdate(
-          context.req.user._id,
+          userId,
           { $pull: { savedBooks: { bookId } } },
           { new: true }
         );

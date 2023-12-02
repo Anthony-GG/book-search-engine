@@ -10,14 +10,13 @@ import { removeBookId } from '../utils/localStorage';
 const token = Auth.loggedIn() ? Auth.getProfile() : null
 
 const SavedBooks = () => {
-  console.log(token.data._id)
   const { loading, error, data } = useQuery(GET_USER, {
     variables: {userId: token.data._id},
   });
   const [removeBook] = useMutation(REMOVE_BOOK);
 
   const handleDeleteBook = async (bookId) => {
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
+    // const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
       return false;
@@ -25,7 +24,7 @@ const SavedBooks = () => {
 
     try {
       await removeBook({
-        variables: { bookId }
+        variables: { bookId, userId: token.data._id }
       });
 
       // upon success, remove book's id from localStorage
@@ -44,9 +43,7 @@ const SavedBooks = () => {
     return <h2>Error loading data. Please try again.</h2>;
   }
 
-  console.log(data)
   const userData = data?.user || { savedBooks: [] };
-  console.log(userData)
 
   return (
     <>

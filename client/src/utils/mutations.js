@@ -68,8 +68,8 @@ export const SAVE_BOOK = gql`
 
 //allows the ability to remove a book on the GraphQL server
 export const REMOVE_BOOK = gql`
-  mutation removeBook($bookId: String!) {
-    removeBook(bookId: $bookId) {
+  mutation removeBook($bookId: String!, $userId: String!) {
+    removeBook(bookId: $bookId, userId: $userId) {
       _id
       username
       email
