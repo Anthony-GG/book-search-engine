@@ -71,6 +71,13 @@ const SearchBooks = () => {
       return false;
     }
 
+      // Check if the book is already saved
+    console.log("SavedBookIds: " + savedBookIds + "  Book Id: " + bookId)
+    if (savedBookIds.includes(bookId)) {
+      console.log('Book already saved!');
+      return;
+    }
+
     try {
       await saveBook({
         variables: {
@@ -85,7 +92,9 @@ const SearchBooks = () => {
       });
 
       // if book successfully saves to user's account, save book id to state
+      console.log(savedBookIds)
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+      
     } catch (err) {
       console.error(err);
     }
